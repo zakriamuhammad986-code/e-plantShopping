@@ -1,22 +1,27 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import {
-  selectCartItems,
-  selectTotalItems,
-  selectTotalCost,
-  incrementQuantity,
-  decrementQuantity,
-  removeItem,
-} from './CartSlice.jsx';
+import { selectCartItems, updateQuantity, removeItem } from './CartSlice.jsx';
 import './CartItem.css';
 
 export default function CartItem() {
   const dispatch = useDispatch();
   const items = useSelector(selectCartItems);
-  const totalItems = useSelector(selectTotalItems);
-  const totalCost = useSelector(selectTotalCost);
   const [checkoutMessage, setCheckoutMessage] = useState('');
+
+  // Explicit calculation of total number of plants in the cart.
+  const calculateTotalItems = () =>
+    items.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Explicit calculation of the total cost of every item in the cart.
+  const calculateTotalCost = () =>
+    items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  // Explicit calculation of the line total for a single cart item.
+  const calculateItemTotal = (item) => item.price * item.quantity;
+
+  const totalItems = calculateTotalItems();
+  const totalCost = calculateTotalCost();
 
   const handleCheckout = () => {
     setCheckoutMessage('Checkout is coming soon \u2014 thanks for your patience!');
@@ -59,7 +64,7 @@ export default function CartItem() {
                   <button
                     type="button"
                     aria-label={`Decrease quantity of ${item.name}`}
-                    onClick={() => dispatch(decrementQuantity(item.id))}
+                    onClick={() => dispatch(updateQuantity({ id: item.id, amount: -1 }))}
                   >
                     &minus;
                   </button>
@@ -67,14 +72,14 @@ export default function CartItem() {
                   <button
                     type="button"
                     aria-label={`Increase quantity of ${item.name}`}
-                    onClick={() => dispatch(incrementQuantity(item.id))}
+                    onClick={() => dispatch(updateQuantity({ id: item.id, amount: 1 }))}
                   >
                     +
                   </button>
                 </div>
 
                 <div className="cart-item-total">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  ${calculateItemTotal(item).toFixed(2)}
                 </div>
 
                 <button
