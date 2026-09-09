@@ -1,44 +1,45 @@
-import { HashRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+```jsx
+import React, { useState } from 'react';
 import Header from './components/Header.jsx';
 import AboutUs from './components/AboutUs.jsx';
 import ProductList from './components/ProductList.jsx';
 import CartItem from './components/CartItem.jsx';
 import './App.css';
 
-function LandingPage() {
-  return (
-    <div className="landing-page">
-      <div className="landing-content">
-        <h1 className="brand-name">Paradise Nursery</h1>
-        <AboutUs />
-        <Link to="/plants" className="get-started-btn">
-          Get Started
-        </Link>
-      </div>
-    </div>
-  );
-}
+function App() {
+  const [showProductList, setShowProductList] = useState(false);
 
-function AppShell() {
-  const location = useLocation();
-  const showHeader = location.pathname !== '/';
+  const handleGetStarted = () => {
+    setShowProductList(true);
+  };
 
   return (
     <div className="app">
-      {showHeader && <Header />}
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/plants" element={<ProductList />} />
-        <Route path="/cart" element={<CartItem />} />
-      </Routes>
+      {!showProductList ? (
+        <div className="landing-page">
+          <div className="landing-content">
+            <h1 className="brand-name">Paradise Nursery</h1>
+
+            <AboutUs />
+
+            <button
+              className="get-started-btn"
+              onClick={() => setShowProductList(true)}
+            >
+              Get Started
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <Header />
+          <ProductList />
+          <CartItem />
+        </>
+      )}
     </div>
   );
 }
 
-export default function App() {
-  return (
-    <HashRouter>
-      <AppShell />
-    </HashRouter>
-  );
-}
+export default App;
+```
